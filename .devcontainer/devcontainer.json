@@ -1,0 +1,33 @@
+{
+    "name": "Mortein Queue Application",
+    "dockerComposeFile": "docker-compose.yaml",
+    "service": "devcontainer",
+    "workspaceFolder": "/workspaces/queue",
+
+    "features": {
+        "ghcr.io/devcontainers/features/dotnet:2": {},
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": 20
+        },
+        "ghcr.io/guiyomh/features/vim:0": {}
+    },
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "esbenp.prettier-vscode",
+                "github.vscode-github-actions",
+                "ms-azuretools.vscode-docker",
+                "ms-dotnettools.csdevkit",
+                "redhat.vscode-yaml"
+            ]
+        }
+    },
+
+    "postCreateCommand": {
+        "npm-deps": "npm install",
+        "dotnet-deps": "dotnet restore Mortein",
+        "dotnet-tool-deps": "dotnet tool restore",
+        "xq": "sudo apt install xq"
+    }
+}

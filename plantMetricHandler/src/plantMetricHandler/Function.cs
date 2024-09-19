@@ -5,6 +5,14 @@ using Amazon.Lambda.Core;
 
 namespace plantMetricHandler;
 
+public class PlantData
+{
+    public required string sensor_id { get; set; }
+    public required string timestamp { get; set; }
+    public double moisture { get; set; }
+    public int sunlight { get; set; }
+    public int temp { get; set; }
+}
 public class Function
 {
     
@@ -14,8 +22,8 @@ public class Function
     /// <param name="input">The event for the Lambda function handler to process.</param>
     /// <param name="context">The ILambdaContext that provides methods for logging and describing the Lambda environment.</param>
     /// <returns></returns>
-    public string FunctionHandler(string input, ILambdaContext context)
+    public string FunctionHandler(PlantData input, ILambdaContext context)
     {
-        return input.ToUpper();
+        return input.sensor_id;
     }
 }

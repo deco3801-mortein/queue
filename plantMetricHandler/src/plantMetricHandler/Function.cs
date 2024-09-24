@@ -23,6 +23,7 @@ public class Function
     /// <returns></returns>
     public string FunctionHandler(PlantData input, ILambdaContext context)
     {
+        
         return input.sensor_id;
     }
 }

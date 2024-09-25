@@ -1,8 +1,5 @@
-using System;
-using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.SystemTextJson;
-using Microsoft.EntityFrameworkCore;
 using plantMetricHandler.Models;
 
 // Assembly attribute to specify the serializer

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace plantMetricHandler.Models;
+﻿namespace plantMetricHandler.Models;
 
 public partial class Device
 {

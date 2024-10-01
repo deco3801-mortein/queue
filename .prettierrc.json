@@ -1,0 +1,15 @@
+{
+    "overrides": [
+        {
+            "files": "**/*.yaml",
+            "options": {
+                "tabWidth": 2
+            }
+        }
+    ],
+    "plugins": ["@prettier/plugin-xml"],
+    "printWidth": 100,
+    "quoteProps": "consistent",
+    "tabWidth": 4,
+    "xmlWhitespaceSensitivity": "ignore"
+}

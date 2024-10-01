@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/dotnet:8.0-noble
+    volumes:
+      - ..:/workspaces/queue:cached
+    env_file: .env
+    command: sleep infinity
+    network_mode: service:database
+
+  database:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    env_file: .env

@@ -1,11 +1,14 @@
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.SystemTextJson;
 using Mortein.Types;
+using System.Text.Json;
+using NodaTime.Serialization.SystemTextJson;
+using NodaTime;
 
 // Assembly attribute to specify the serializer
-[assembly: LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
+[assembly: LambdaSerializer(typeof(Handler.CustomLambdaSerializer))]
 
-namespace Mortein
+namespace Handler
 {
     public class Function
     {
@@ -37,7 +40,7 @@ namespace Mortein
             {
 
                 // Log the incoming data for debugging
-                context.Logger.LogLine($"Received PlantData: DeviceId={healthcheckDatum.DeviceId}, Timestamp={healthcheckDatum.Timestamp}, Moisture={healthcheckDatum.Moisture}, Sunlight={healthcheckDatum.Sunlight}, Temp={healthcheckDatum.Temperature}, IsVibrating={healthcheckDatum.IsVibrating}");
+                context.Logger.LogLine($"Received PlantData: {JsonSerializer.Serialize(healthcheckDatum)}");
 
                 // Add the HealthcheckData entry
                 dbContext.HealthcheckData.Add(healthcheckDatum);
@@ -54,6 +57,21 @@ namespace Mortein
 
                 throw;
             }
+        }
+    }
+
+    public class CustomLambdaSerializer : DefaultLambdaJsonSerializer
+    {
+        public CustomLambdaSerializer()
+            : base(CreateCustomizer())
+        { }
+
+        private static Action<JsonSerializerOptions> CreateCustomizer()
+        {
+            return (JsonSerializerOptions options) =>
+            {
+                options.ConfigureForNodaTime(DateTimeZoneProviders.Bcl);
+            };
         }
     }
 }

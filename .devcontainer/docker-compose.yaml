@@ -2,22 +2,15 @@ version: "3.8"
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: mcr.microsoft.com/devcontainers/dotnet:8.0-noble
     volumes:
       - ..:/workspaces/queue:cached
     env_file: .env
     command: sleep infinity
-    network_mode: service:db
+    network_mode: service:database
 
-  db:
-    image: postgres:14.3
+  database:
+    image: postgres:latest
     ports:
       - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
     env_file: .env
-
-volumes:
-  postgres-data:

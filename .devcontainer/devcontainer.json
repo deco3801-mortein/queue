@@ -26,6 +26,7 @@
 
     "postCreateCommand": {
         "npm-deps": "npm install",
-        "dotnet-deps": "dotnet restore"
+        "dotnet-deps": "dotnet restore",
+        "safe-git": "git config --global --add safe.directory ${containerWorkspaceFolder}"
     }
 }

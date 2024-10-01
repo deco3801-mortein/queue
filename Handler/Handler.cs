@@ -1,45 +1,46 @@
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.SystemTextJson;
-using plantMetricHandler.Models;
+using Mortein.Types;
 
 // Assembly attribute to specify the serializer
 [assembly: LambdaSerializer(typeof(DefaultLambdaJsonSerializer))]
 
-namespace plantMetricHandler
+namespace Mortein
 {
     public class Function
     {
-        private static readonly MorteinContext dbContext;
+        private static readonly DatabaseContext dbContext;
 
         // Static constructor to initialize the DbContext once per Lambda container
         static Function()
         {
 
             // Instantiate the DbContext with the configured options
-            dbContext = new MorteinContext();
+            dbContext = new DatabaseContext();
+
+            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("AWS_LAMBDA_FUNCTION_NAME")))
+            {
+                dbContext.Database.EnsureDeleted();
+                dbContext.Database.EnsureCreated();
+            }
         }
 
         /// <summary>
         /// Lambda function handler to process PlantData and insert it into RDS.
         /// </summary>
-        /// <param name="plantDatum">The PlantData object deserialized from the IoT message.</param>
+        /// <param name="healthcheckDatum">The PlantData object deserialized from the IoT message.</param>
         /// <param name="context">Lambda context for logging.</param>
         /// <returns></returns>
-        public async Task FunctionHandler(PlantDatum plantDatum, ILambdaContext context)
+        public async Task FunctionHandler(HealthcheckDatum healthcheckDatum, ILambdaContext context)
         {
             try
             {
-                // Set Timestamp if not provided
-                if (plantDatum.Timestamp == default)
-                {
-                    plantDatum.Timestamp = DateTime.UtcNow;
-                }
 
                 // Log the incoming data for debugging
-                context.Logger.LogLine($"Received PlantData: SensorId={plantDatum.SensorId}, Timestamp={plantDatum.Timestamp}, Moisture={plantDatum.Moisture}, Sunlight={plantDatum.Sunlight}, Temp={plantDatum.Temp}, VibrationStatus={plantDatum.VibrationStatus}");
+                context.Logger.LogLine($"Received PlantData: DeviceId={healthcheckDatum.DeviceId}, Timestamp={healthcheckDatum.Timestamp}, Moisture={healthcheckDatum.Moisture}, Sunlight={healthcheckDatum.Sunlight}, Temp={healthcheckDatum.Temperature}, IsVibrating={healthcheckDatum.IsVibrating}");
 
-                // Add the PlantData entry
-                dbContext.PlantData.Add(plantDatum);
+                // Add the HealthcheckData entry
+                dbContext.HealthcheckData.Add(healthcheckDatum);
 
                 // Save changes to the database
                 await dbContext.SaveChangesAsync();

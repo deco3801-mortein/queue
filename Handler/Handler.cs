@@ -4,7 +4,7 @@ using Mortein.Types;
 using System.Text.Json;
 using NodaTime.Serialization.SystemTextJson;
 using NodaTime;
-
+using Microsoft.EntityFrameworkCore;
 // Assembly attribute to specify the serializer
 [assembly: LambdaSerializer(typeof(Handler.CustomLambdaSerializer))]
 
@@ -19,7 +19,8 @@ public class Function
     {
 
         // Instantiate the DbContext with the configured options
-        dbContext = new DatabaseContext();
+        dbContext = new DatabaseContext(new DbContextOptionsBuilder<DatabaseContext>()
+            .EnableSensitiveDataLogging().Options);
 
         if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("AWS_LAMBDA_FUNCTION_NAME")))
         {
@@ -36,27 +37,26 @@ public class Function
     /// <returns></returns>
     public async Task FunctionHandler(HealthcheckDatum healthcheckDatum, ILambdaContext context)
     {
+        // Log the incoming data for debugging
+        context.Logger.LogLine($"Received PlantData: {JsonSerializer.Serialize(healthcheckDatum)}");
+
         try
         {
-
-            // Log the incoming data for debugging
-            context.Logger.LogLine($"Received PlantData: {JsonSerializer.Serialize(healthcheckDatum)}");
-
             // Add the HealthcheckData entry
             dbContext.HealthcheckData.Add(healthcheckDatum);
-
+            context.Logger.LogLine("Added");
             // Save changes to the database
             await dbContext.SaveChangesAsync();
-
-            context.Logger.LogLine("PlantData inserted successfully.");
         }
         catch (Exception ex)
         {
             context.Logger.LogLine($"Error inserting PlantData: {ex.Message}");
             context.Logger.LogLine(ex.StackTrace);
 
+            dbContext.HealthcheckData.Remove(healthcheckDatum);
             throw;
         }
+        context.Logger.LogLine("PlantData inserted successfully.");
     }
 }
 
